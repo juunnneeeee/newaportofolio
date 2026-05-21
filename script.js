@@ -34,25 +34,60 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     /* ==========================================================================
-       2. Dynamic Timezone Clock (Tokyo / GMT+9)
+       2. Traveling Timezone Clock (Cycles through World Cities)
        ========================================================================== */
     const localTimeEl = document.getElementById('localTime');
+    const timezoneLabelEl = document.querySelector('.timezone-label');
+    const timeWidget = document.querySelector('.time-widget');
 
-    function updateTime() {
-        if (!localTimeEl) return;
+    const worldLocations = [
+        { label: 'TOKYO / GMT+9', zone: 'Asia/Tokyo' },
+        { label: 'LONDON / GMT+0', zone: 'Europe/London' },
+        { label: 'NEW YORK / GMT-5', zone: 'America/New_York' },
+        { label: 'PARIS / GMT+1', zone: 'Europe/Paris' }
+    ];
+    let currentLocationIndex = 0;
+
+    function formatTime(date, timeZone) {
         const options = {
-            timeZone: 'Asia/Tokyo',
+            timeZone: timeZone,
             hour: '2-digit',
             minute: '2-digit',
             second: '2-digit',
             hour12: true
         };
-        const formatter = new Intl.DateTimeFormat('en-US', options);
-        localTimeEl.textContent = formatter.format(new Date());
+        return new Intl.DateTimeFormat('en-US', options).format(date);
     }
 
-    updateTime();
-    setInterval(updateTime, 1000);
+    function updateClock() {
+        if (!localTimeEl || !timezoneLabelEl) return;
+        const location = worldLocations[currentLocationIndex];
+        const now = new Date();
+        localTimeEl.textContent = formatTime(now, location.zone);
+        timezoneLabelEl.textContent = location.label;
+    }
+
+    // Cycle timezone locations every 4 seconds with smooth transition
+    setInterval(() => {
+        if (timeWidget) {
+            timeWidget.style.opacity = '0';
+            timeWidget.style.transform = 'translateY(-2px)';
+            
+            setTimeout(() => {
+                currentLocationIndex = (currentLocationIndex + 1) % worldLocations.length;
+                updateClock();
+                timeWidget.style.opacity = '1';
+                timeWidget.style.transform = 'translateY(0)';
+            }, 300);
+        } else {
+            currentLocationIndex = (currentLocationIndex + 1) % worldLocations.length;
+            updateClock();
+        }
+    }, 4000);
+
+    // Continuous tick every second for active location
+    setInterval(updateClock, 1000);
+    updateClock();
 
     /* ==========================================================================
        3. Light & Dark Theme Switcher with LocalStorage Persistence
@@ -306,5 +341,99 @@ document.addEventListener('DOMContentLoaded', () => {
                     console.error('Clipboard copy failed: ', err);
                 });
         });
+    }
+
+    /* ==========================================================================
+       8. High-Performance Backplane Particles Canvas
+       ========================================================================== */
+    const canvas = document.getElementById('bgParticles');
+    if (canvas) {
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        let mouseX = 0;
+        let mouseY = 0;
+        let targetMouseX = 0;
+        let targetMouseY = 0;
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            initParticles();
+        }
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.vx = (Math.random() - 0.5) * 0.2;
+                this.vy = -Math.random() * 0.4 - 0.1;
+                this.radius = Math.random() * 1.5 + 0.5;
+                this.opacity = Math.random() * 0.4 + 0.1;
+            }
+
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+
+                // Dynamic mouse deflection breeze effect
+                const dx = mouseX - this.x;
+                const dy = mouseY - this.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist < 220) {
+                    const force = (220 - dist) / 220;
+                    this.x -= (dx / dist) * force * 0.45;
+                    this.y -= (dy / dist) * force * 0.45;
+                }
+
+                // Recycle particles off screen
+                if (this.y < 0) {
+                    this.y = canvas.height;
+                    this.x = Math.random() * canvas.width;
+                }
+                if (this.x < 0) this.x = canvas.width;
+                if (this.x > canvas.width) this.x = 0;
+            }
+
+            draw() {
+                const isLight = document.body.classList.contains('light-theme');
+                const rgb = isLight ? '0, 0, 0' : '255, 255, 255';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(${rgb}, ${this.opacity})`;
+                ctx.fill();
+            }
+        }
+
+        function initParticles() {
+            particles = [];
+            const particleCount = Math.floor((canvas.width * canvas.height) / 18000);
+            const count = Math.min(Math.max(particleCount, 40), 90);
+            for (let i = 0; i < count; i++) {
+                particles.push(new Particle());
+            }
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        document.addEventListener('mousemove', (e) => {
+            targetMouseX = e.clientX;
+            targetMouseY = e.clientY;
+        });
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Linear interpolate mouse breeze positions for extreme smoothness
+            mouseX += (targetMouseX - mouseX) * 0.08;
+            mouseY += (targetMouseY - mouseY) * 0.08;
+
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(animateParticles);
+        }
+        animateParticles();
     }
 });
