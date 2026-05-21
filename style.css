@@ -840,6 +840,21 @@ body.light-theme .floating-preview {
 }
 
 /* ==========================================================================
+   Newa Theme Explanation Bento Card (Span 4 columns, 1 row)
+   ========================================================================== */
+.card-theme-explain {
+    grid-column: span 4;
+}
+
+.theme-explain-text {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    font-weight: 400;
+    margin-top: 0.5rem;
+    line-height: 1.65;
+}
+
+/* ==========================================================================
    Impact Metrics Stats Card (Span 4 columns, 1 row)
    ========================================================================== */
 .card-stats {
@@ -876,18 +891,41 @@ body.light-theme .floating-preview {
 }
 
 /* ==========================================================================
-   Contact CTA / Copy Email Card (Span 4 columns, 1 row)
+   Contact CTA / Copy Email Card (Span 12 columns, 1 row)
    ========================================================================== */
 .card-contact {
-    grid-column: span 4;
+    grid-column: span 12;
+    min-height: 180px;
+}
+
+.contact-inner-flex {
+    flex-direction: row !important;
+    justify-content: space-between;
+    align-items: center;
+    gap: 2rem;
+    width: 100%;
+}
+
+.contact-left {
+    flex: 1.5;
+}
+
+.contact-right {
+    flex: 1;
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+}
+
+.contact-right .email-copy-btn {
+    max-width: 320px;
 }
 
 .contact-pitch {
-    font-size: 1.6rem;
+    font-size: 1.8rem;
     letter-spacing: -0.03em;
     line-height: 1.1;
     margin-top: 0.5rem;
-    margin-bottom: 1.2rem;
     text-transform: uppercase;
 }
 
@@ -994,6 +1032,10 @@ body.light-theme .floating-preview {
     .card-skills {
         grid-column: span 3;
     }
+
+    .card-theme-explain {
+        grid-column: span 3;
+    }
     
     .card-stats {
         grid-column: span 3;
@@ -1067,6 +1109,10 @@ body.light-theme .floating-preview {
     .card-skills {
         grid-column: span 6;
     }
+
+    .card-theme-explain {
+        grid-column: span 6;
+    }
     
     .card-stats {
         grid-column: span 6;
@@ -1074,6 +1120,20 @@ body.light-theme .floating-preview {
     
     .card-contact {
         grid-column: span 6;
+    }
+
+    .contact-inner-flex {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 1.5rem !important;
+    }
+
+    .contact-right {
+        justify-content: flex-start !important;
+    }
+
+    .contact-right .email-copy-btn {
+        max-width: 100% !important;
     }
     
     .footer-inner {
@@ -1091,7 +1151,7 @@ body.light-theme .floating-preview {
     }
     
     .card-hero, .card-theme, .card-socials, .card-carousel,
-    .card-projects-list, .card-skills, .card-stats, .card-contact {
+    .card-projects-list, .card-skills, .card-theme-explain, .card-stats, .card-contact {
         grid-column: span 1;
         grid-row: span 1;
     }
